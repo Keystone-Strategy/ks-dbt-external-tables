@@ -1,6 +1,21 @@
 {% macro snowflake_create_empty_table(source_node) %}
 
     {%- set columns = source_node.columns.values() %}
+    {%- set external = source_node.external %}
+    {%- set warehouse = external.snowflake_warehouse -%}
+
+    {% if not warehouse %}
+        {% set warehouse = target.warehouse %}
+    {% endif %}
+
+    {% set query_set_warehouse %}
+        use warehouse {{ warehouse }}
+    {% endset %}
+    {% if execute %}
+        {% set result_chnage_warehouse = run_query(query_set_warehouse) %}
+    {% endif %}
+    
+
 
     create or replace table {{source(source_node.source_name, source_node.name)}} (
         {% if columns|length == 0 %}
