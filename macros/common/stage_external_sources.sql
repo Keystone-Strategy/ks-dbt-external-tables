@@ -13,7 +13,12 @@
                 
                     {% if '.' in src %}
                         {% set src_s = src.split('.') %}
-                        {% if src_s[0] == node.source_name and src_s[1] == node.name %}
+                        {% if src_s[0] == node.source_name and 
+                            (
+                                src_s[1] == node.name or 
+                                ('*' in src_s[1] and src_s[1]|replace('*', '') in node.name)
+                            )
+                        %}
                             {% do sources_to_stage.append(node) %}
                         {% endif %}
                     {% else %}
