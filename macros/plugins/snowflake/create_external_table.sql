@@ -41,7 +41,7 @@
                         {{column.expression}}
                     {%- else -%}
                         {%- set col_id = 'value:c' ~ loop.index if is_csv else 'value:' ~ column_alias -%}
-                        (case when is_null_value({{col_id}}) or lower({{col_id}}) = 'null' then null else {{col_id}} end)
+                        ({{col_id}})
                     {%- endif -%}
                 {%- endset %}
                 {{column_alias}} {{column.data_type}} as ({{col_expression}}::{{column.data_type}})
@@ -51,7 +51,7 @@
         {%- for column in columns_infer %}
                 {%- set col_expression -%}
                     {%- set col_id = 'value:' ~ column[0] -%}
-                    (case when is_null_value({{col_id}}) or lower({{col_id}}) = 'null' then null else {{col_id}} end)
+                    ({{col_id}})
                 {%- endset %}
                 {{column[0]}} {{column[1]}} as ({{col_expression}}::{{column[1]}})
                 {{- ',' if not loop.last -}}
