@@ -56,7 +56,11 @@
         {%- for column in columns_infer %}
                 {%- set col_expression -%}
                     {%- set col_id = 'value:' ~ column[0] -%}
-                    ({{col_id}})
+                    {% if is_csv %}
+                        (case when is_null_value({{col_id}}) or lower({{col_id}}) = 'null' then null else {{col_id}} end)
+                    {% else %}
+                        ({{col_id}})
+                    {% endif %}
                 {%- endset %}
                 {{column[0]}} {{column[1]}} as ({{col_expression}}::{{column[1]}})
                 {{- ',' if not loop.last -}}
