@@ -40,8 +40,13 @@
                     {%- if column.expression -%}
                         {{column.expression}}
                     {%- else -%}
-                        {%- set col_id = 'value:c' ~ loop.index if is_csv else 'value:' ~ column_alias -%}
-                        ({{col_id}})
+                        {% if is_csv %}
+                            {%- set col_id = 'value:c' ~ loop.index -%}
+                            (case when is_null_value({{col_id}}) or lower({{col_id}}) = 'null' then null else {{col_id}} end)
+                        {% else %}
+                            {%- set col_id = 'value:' ~ column_alias -%}
+                            ({{col_id}})
+                        {% endif %}
                     {%- endif -%}
                 {%- endset %}
                 {{column_alias}} {{column.data_type}} as ({{col_expression}}::{{column.data_type}})
@@ -51,7 +56,11 @@
         {%- for column in columns_infer %}
                 {%- set col_expression -%}
                     {%- set col_id = 'value:' ~ column[0] -%}
-                    ({{col_id}})
+                    {% if is_csv %}
+                        (case when is_null_value({{col_id}}) or lower({{col_id}}) = 'null' then null else {{col_id}} end)
+                    {% else %}
+                        ({{col_id}})
+                    {% endif %}
                 {%- endset %}
                 {{column[0]}} {{column[1]}} as ({{col_expression}}::{{column[1]}})
                 {{- ',' if not loop.last -}}
