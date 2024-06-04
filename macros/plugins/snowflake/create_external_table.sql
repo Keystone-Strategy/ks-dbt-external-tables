@@ -40,8 +40,13 @@
                     {%- if column.expression -%}
                         {{column.expression}}
                     {%- else -%}
-                        {%- set col_id = 'value:c' ~ loop.index if is_csv else 'value:' ~ column_alias -%}
-                        ({{col_id}})
+                        {% if is_csv %}
+                            {%- set col_id = 'value:c' ~ loop.index -%}
+                            (case when is_null_value({{col_id}}) or lower({{col_id}}) = 'null' then null else {{col_id}} end)
+                        {% else %}
+                            {%- set col_id = 'value:' ~ column_alias -%}
+                            ({{col_id}})
+                        {% endif %}
                     {%- endif -%}
                 {%- endset %}
                 {{column_alias}} {{column.data_type}} as ({{col_expression}}::{{column.data_type}})
